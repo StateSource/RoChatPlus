@@ -1,0 +1,27 @@
+{
+  "name": "RobloxChatAddon",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "ChatServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterCharacterScripts": {},
+      "StarterPlayerScripts": {
+        "ChatClient": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "ChatShared": {
+        "$path": "src/shared"
+      }
+    }
+  }
+}
