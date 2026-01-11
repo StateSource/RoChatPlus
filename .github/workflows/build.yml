@@ -14,52 +14,28 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: '6.6.0'
-        host: 'windows'
-        target: 'desktop'
-        arch: 'win64_msvc2019_64'
-        modules: 'qtbase qttools'
-        cache: 'true'
-    
-    - name: Install CMake
-      uses: lukka/get-cmake@latest
-    
-    - name: Create Build Directory
-      run: mkdir build
-    
-    - name: Configure CMake
+    - name: Install Qt via vcpkg
       run: |
-        cd build
-        cmake .. -G "Visual Studio 17 2022" -A x64
-      env:
-        Qt6_DIR: ${{ env.Qt6_DIR }}
+        vcpkg integrate install
+        vcpkg install qt6-base:x64-windows qt6-tools:x64-windows
     
-    - name: Build Release
+    - name: Install CMake and Ninja
+      run: choco install cmake ninja -y
+    
+    - name: Configure and Build
       run: |
+        mkdir build
         cd build
+        cmake .. -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release
     
-    - name: Deploy Qt Libraries
+    - name: List build output
       run: |
-        cd build\Release
-        & "${{ env.Qt6_DIR }}\bin\windeployqt.exe" RoChatPlus.exe
+        dir build /s /b
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
         name: RoChatPlus-Windows
-        path: build/Release/
+        path: build/
         retention-days: 30
-    
-    - name: Create Release (if tagged)
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          build/Release/RoChatPlus.exe
-          build/Release/*.dll
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
