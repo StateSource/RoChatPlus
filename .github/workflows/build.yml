@@ -1,9 +1,7 @@
-name: Build RoChatPlus Windows EXE
+name: Build RoChatPlus
 
 on:
   push:
-    branches: [ main, master, develop ]
-  pull_request:
     branches: [ main, master, develop ]
   workflow_dispatch:
 
@@ -14,28 +12,24 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install Qt via vcpkg
+    - name: Install dependencies
       run: |
-        vcpkg integrate install
-        vcpkg install qt6-base:x64-windows qt6-tools:x64-windows
+        choco install qt-framework ninja cmake -y
     
-    - name: Install CMake and Ninja
-      run: choco install cmake ninja -y
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v1.1
     
-    - name: Configure and Build
+    - name: Build
       run: |
         mkdir build
         cd build
-        cmake .. -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --config Release
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release --parallel 4
+        if exist Release\RoChatPlus.exe (echo Build succeeded!) else (exit /b 1)
     
-    - name: List build output
-      run: |
-        dir build /s /b
-    
-    - name: Upload Artifact
+    - name: Upload artifact
+      if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: RoChatPlus-Windows
+        name: build-output
         path: build/
-        retention-days: 30
