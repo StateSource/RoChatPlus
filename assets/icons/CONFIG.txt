@@ -1,0 +1,16 @@
+./
+{
+  logo-256x256.png
+  logo-48x48.png
+  logo-32x32.png
+  logo-16x16.png
+  settings.png
+  exit.png
+  about.png
+  send.png
+  link.png
+  image.png
+  close.png
+  add_server.png  
+  menu.png
+}
